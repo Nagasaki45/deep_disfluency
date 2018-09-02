@@ -5,31 +5,6 @@ import time
 import watson_streaming
 
 
-class FakeIBMWatsonStreamer(fluteline.Producer):
-    '''A fake streamer to simulate for testing, whilst offline
-    '''
-
-    def __init__(self, fake_stream):
-        super(FakeIBMWatsonStreamer, self).__init__()
-        self.fake_stream = fake_stream  # a list of updates to be fired
-
-    def enter(self):
-        print "starting fake streaming"
-
-    def exit(self):
-        print "finished fake streaming"
-
-    def produce(self):
-        if len(self.fake_stream) > 0:
-            update = self.fake_stream.pop(0)
-            self.output.put(update)
-
-
-class Printer(fluteline.Consumer):
-    def consume(self, msg):
-        print(msg)
-
-
 class IBMWatsonAdapter(fluteline.Consumer):
     '''
     A fluteline consumer-producer that receives transcription from
@@ -111,76 +86,3 @@ class IBMWatsonAdapter(fluteline.Consumer):
             self.memory.pop(start_time, None)
         self.running_id = itertools.count(update_id+1)  # set the counter
         return update_id
-
-if __name__ == '__main__':
-    fake_updates_raw_1 = [
-        [('hello', 0, 1),
-         ('my', 1, 2),
-         ('name', 2, 3)
-         ],
-
-        [('hello', 0.5, 1),
-         ('my', 1, 2),
-         ('bame', 2, 3)
-         ],
-
-        [('once', 3.4, 4),
-         ('upon', 4.2, 4.6),
-         ('on', 4.3, 4.8)
-         ]
-    ]
-
-    fake_updates_raw_2 = [
-            # First new
-            [
-                ('hello', 0, 1),
-            ],
-            # Old and add new
-            [
-                ('hello', 0, 1),
-                ('my', 1, 2),
-            ],
-            # Updating old timestamp and add new
-            [
-                ('hello', 0.5, 1),
-                ('my', 1, 2),
-                ('name', 3, 4),
-            ],
-            # Updating old word
-            [
-                ('hello', 0.5, 1),
-                ('your', 1, 2),
-                ('name', 3, 4),
-            ],
-            # Multiple old and new ones with timestamp overlap
-            [
-                ('once', 3.4, 4),
-                ('upon', 4.2, 4.6),
-                ('on', 4.3, 4.8),
-            ]
-        ]
-    # create a fake list of incoming transcription result dicts from watson
-    fake_updates_data = []
-    result_index = 0
-    for update in fake_updates_raw_2:
-        data = {
-            'result_index': result_index,
-            'results': [{'alternatives': [{'timestamps': update}]}]
-        }
-        fake_updates_data.append(data)
-
-    nodes = [
-       FakeIBMWatsonStreamer(fake_updates_data),
-       IBMWatsonAdapter(),
-       Printer()
-    ]
-
-    tic = time.clock()
-
-    fluteline.connect(nodes)
-    fluteline.start(nodes)
-
-    print time.clock() - tic, "seconds"
-
-    time.sleep(1)
-    fluteline.stop(nodes)
