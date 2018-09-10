@@ -62,10 +62,10 @@ class TestIBMWatson(unittest.TestCase):
                 'result_index': 0,
                 'results': [{'alternatives': [{'timestamps': update}]}]
             }
-            self.adapter._input.put(data)
+            self.adapter.input.put(data)
 
         for word, id_ in expected_output:
-            result = self.adapter._output.get()
+            result = self.adapter.output.get()
             self.assertEqual(result['word'], word)
             self.assertEqual(result['id'], id_)
 
