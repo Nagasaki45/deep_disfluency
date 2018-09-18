@@ -8,9 +8,9 @@ class TestDeepDisfluencyTagger(unittest.TestCase):
     def test_tagging_a_sentence(self):
 
         disf = DeepDisfluencyTagger(
-            config_file="deep_disfluency/experiments/experiment_configs.csv",
+            config_file="experiments/experiment_configs.csv",
             config_number=35,
-            saved_model_dir="deep_disfluency/experiments/035/epoch_6",
+            saved_model_dir="experiments/035/epoch_6",
             use_timing_data=True
         )
 

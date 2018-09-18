@@ -1,5 +1,7 @@
 import unittest
 
+import fluteline
+
 from deep_disfluency.asr.ibm_watson import IBMWatsonAdapter
 
 
@@ -7,6 +9,7 @@ class TestIBMWatson(unittest.TestCase):
 
     def setUp(self):
         self.adapter = IBMWatsonAdapter()
+        self.adapter.output = fluteline.Queue()
         self.adapter.start()
 
     def tearDown(self):
