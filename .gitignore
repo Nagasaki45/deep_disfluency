@@ -30,3 +30,4 @@ credentials.json
 build
 *.egg-info
 dist
+.eggs
